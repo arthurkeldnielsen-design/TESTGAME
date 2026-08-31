@@ -305,7 +305,7 @@ window.addEventListener('resize', () => {
 
 // Initialize game
 setupScene();
-createMTrack();
+createTrack();
 car = {};
 createCar();
 animate();
