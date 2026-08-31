@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Racing Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+        }
+        
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #canvas {
+            flex: 1;
+            display: block;
+        }
+        
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .hud-item {
+            margin: 5px 0;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+        }
+        
+        #timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        #startScreen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+        }
+        
+        #startScreen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #00ff00;
+            text-shadow: 0 0 20px #00ff00;
+        }
+        
+        #startScreen button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        #startScreen button:hover {
+            background: #00dd00;
+            transform: scale(1.05);
+        }
+        
+        #gameOver {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 101;
+            display: none;
+        }
+        
+        #gameOver h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #00ff00;
+            text-shadow: 0 0 20px #00ff00;
+        }
+        
+        #gameOver button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="canvas"></canvas>
+        
+        <div id="startScreen">
+            <h1>🏁 3D RACING GAME 🏁</h1>
+            <p style="font-size: 18px; margin-bottom: 40px;">Complete 3 laps around the track!</p>
+            <button onclick="startGame()">START GAME</button>
+        </div>
+        
+        <div id="gameOver">
+            <h1>🎉 RACE COMPLETE! 🎉</h1>
+            <p id="finalTime" style="font-size: 24px; margin-bottom: 40px;"></p>
+            <button onclick="location.reload()">PLAY AGAIN</button>
+        </div>
+        
+        <div id="hud">
+            <div class="hud-item">Speed: <span id="speed">0</span> km/h</div>
+            <div class="hud-item">Lap: <span id="lap">1</span> / 3</div>
+            <div class="hud-item">Position: <span id="position">Start</span></div>
+        </div>
+        
+        <div id="timer">
+            <span id="timeDisplay">0:00</span>
+        </div>
+        
+        <div id="controls">
+            <div>↑ / W - Accelerate</div>
+            <div>↓ / S - Brake</div>
+            <div>← / A - Turn Left</div>
+            <div>→ / D - Turn Right</div>
+            <div style="margin-top: 10px; border-top: 1px solid #00ff00; padding-top: 10px;">SPACE - Reset Position</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
