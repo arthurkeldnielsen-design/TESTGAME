@@ -4,171 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Racing Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #000;
-            color: #fff;
-        }
-        
-        #gameContainer {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        #canvas {
-            flex: 1;
-            display: block;
-        }
-        
-        #hud {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            text-shadow: 0 0 10px #00ff00;
-        }
-        
-        .hud-item {
-            margin: 5px 0;
-        }
-        
-        #controls {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border: 1px solid #00ff00;
-            border-radius: 5px;
-        }
-        
-        #timer {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            color: #00ff00;
-            text-shadow: 0 0 10px #00ff00;
-        }
-        
-        #startScreen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 100;
-        }
-        
-        #startScreen h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #00ff00;
-            text-shadow: 0 0 20px #00ff00;
-        }
-        
-        #startScreen button {
-            padding: 15px 40px;
-            font-size: 20px;
-            background: #00ff00;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        #startScreen button:hover {
-            background: #00dd00;
-            transform: scale(1.05);
-        }
-        
-        #gameOver {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 101;
-            display: none;
-        }
-        
-        #gameOver h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #00ff00;
-            text-shadow: 0 0 20px #00ff00;
-        }
-        
-        #gameOver button {
-            padding: 15px 40px;
-            font-size: 20px;
-            background: #00ff00;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #000; color: #fff; overflow: hidden; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #0f0; font-family: 'Courier New'; font-size: 16px; }
+        #timer { position: absolute; top: 20px; right: 20px; color: #0f0; font-size: 24px; font-family: 'Courier New'; }
+        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        #startScreen h1 { font-size: 48px; margin-bottom: 30px; color: #0f0; }
+        #startScreen button { padding: 20px 50px; font-size: 24px; background: #0f0; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; }
+        #startScreen button:hover { background: #0d0; }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="canvas"></canvas>
-        
-        <div id="startScreen">
-            <h1>🏁 3D RACING GAME 🏁</h1>
-            <p style="font-size: 18px; margin-bottom: 40px;">Complete 3 laps around the track!</p>
-            <button onclick="startGame()">START GAME</button>
-        </div>
-        
-        <div id="gameOver">
-            <h1>🎉 RACE COMPLETE! 🎉</h1>
-            <p id="finalTime" style="font-size: 24px; margin-bottom: 40px;"></p>
-            <button onclick="location.reload()">PLAY AGAIN</button>
-        </div>
-        
-        <div id="hud">
-            <div class="hud-item">Speed: <span id="speed">0</span> km/h</div>
-            <div class="hud-item">Lap: <span id="lap">1</span> / 3</div>
-            <div class="hud-item">Position: <span id="position">Start</span></div>
-        </div>
-        
-        <div id="timer">
-            <span id="timeDisplay">0:00</span>
-        </div>
-        
-        <div id="controls">
-            <div>↑ / W - Accelerate</div>
-            <div>↓ / S - Brake</div>
-            <div>← / A - Turn Left</div>
-            <div>→ / D - Turn Right</div>
-            <div style="margin-top: 10px; border-top: 1px solid #00ff00; padding-top: 10px;">SPACE - Reset Position</div>
-        </div>
+    <div id="startScreen">
+        <h1>🏁 3D RACING GAME 🏁</h1>
+        <button onclick="startGame()">START GAME</button>
     </div>
+    <div id="ui">
+        <div>Speed: <span id="speed">0</span> km/h</div>
+        <div>Lap: <span id="lap">0</span>/3</div>
+    </div>
+    <div id="timer">0:00</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="game.js"></script>
+    <script>
+        let scene, camera, renderer, car, gameStarted = false;
+        const keys = {};
+        let speed = 0, angle = 0, time = 0, lap = 0;
+        
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameStarted = true;
+            time = 0;
+            lap = 0;
+            initGame();
+        }
+
+        function initGame() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb);
+            scene.fog = new THREE.Fog(0x87ceeb, 500, 1000);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 50;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            // Lights
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(100, 100, 100);
+            light.castShadow = true;
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            // Ground
+            const groundGeo = new THREE.PlaneGeometry(500, 500);
+            const groundMat = new THREE.MeshLambertMaterial({ color: 0x228b22 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -10;
+            scene.add(ground);
+
+            // Track - Torus
+            const trackGeo = new THREE.TorusGeometry(80, 30, 32, 200);
+            const trackMat = new THREE.MeshLambertMaterial({ color: 0x333 });
+            const track = new THREE.Mesh(trackGeo, trackMat);
+            track.rotation.x = Math.PI / 2;
+            scene.add(track);
+
+            // Car
+            car = new THREE.Group();
+            
+            // Car body
+            const bodyGeo = new THREE.BoxGeometry(8, 6, 16);
+            const bodyMat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.castShadow = true;
+            car.add(body);
+
+            // Wheels
+            const wheelGeo = new THREE.CylinderGeometry(4, 4, 4, 32);
+            const wheelMat = new THREE.MeshLambertMaterial({ color: 0x222 });
+            
+            for (let i = 0; i < 4; i++) {
+                const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.castShadow = true;
+                wheel.position.x = (i < 2 ? -6 : 6);
+                wheel.position.y = -4;
+                wheel.position.z = (i % 2 === 0 ? -6 : 6);
+                car.add(wheel);
+            }
+
+            car.position.set(0, 0, 95);
+            scene.add(car);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (gameStarted) {
+                time += 1/60;
+                
+                // Controls
+                if (keys['ArrowUp'] || keys['w']) speed = Math.min(speed + 0.05, 2);
+                else if (keys['ArrowDown'] || keys['s']) speed = Math.max(speed - 0.1, -1);
+                else speed *= 0.95;
+
+                if (keys['ArrowLeft'] || keys['a']) angle += 0.05 * (speed / 2);
+                if (keys['ArrowRight'] || keys['d']) angle -= 0.05 * (speed / 2);
+
+                // Car position
+                car.position.x = 80 * Math.cos(angle);
+                car.position.z = 80 * Math.sin(angle);
+                car.rotation.y = angle + Math.PI / 2;
+
+                // Lap detection (simple)
+                if (Math.abs(angle) < 0.2 && speed > 0 && lap < 3) {
+                    lap++;
+                }
+                if (angle > Math.PI * 2) angle -= Math.PI * 2;
+
+                // Update UI
+                document.getElementById('speed').textContent = Math.round(Math.abs(speed) * 50);
+                document.getElementById('lap').textContent = lap;
+                
+                const mins = Math.floor(time / 60);
+                const secs = Math.floor(time % 60);
+                document.getElementById('timer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+                // Camera follow
+                camera.position.x = car.position.x - Math.cos(angle) * 50;
+                camera.position.y = 30;
+                camera.position.z = car.position.z - Math.sin(angle) * 50;
+                camera.lookAt(car.position);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Input
+        window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
